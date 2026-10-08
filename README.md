@@ -1,11 +1,16 @@
 # DataCore
 
+[![Test host tools](https://github.com/impateltirth/datacore/actions/workflows/test-host-tools.yml/badge.svg)](https://github.com/impateltirth/datacore/actions/workflows/test-host-tools.yml)
+
 Multi-channel ADC data acquisition on STM32: 4 channels sampled at 10 kHz via timer-triggered ADC with DMA double-buffering, framed and streamed over UART at 921600 baud.
 
 **Hardware:** STM32F103C8T6 · ADC1 · DMA1 · TIM2 · USART1
 **Firmware:** STM32F1 HAL (no CubeMX project needed — init is hand-written in `Src/main.c`)
 
 ## Pipeline
+
+See [`docs/architecture.md`](docs/architecture.md) for the end-to-end data-flow
+diagram and the boundary between implemented behavior and hardware validation.
 
 ```
 TIM2 @10 kHz TRGO
