@@ -2,6 +2,8 @@
 
 [![Test host tools](https://github.com/impateltirth/datacore/actions/workflows/test-host-tools.yml/badge.svg)](https://github.com/impateltirth/datacore/actions/workflows/test-host-tools.yml)
 
+![DataCore acquisition pipeline](docs/pipeline-overview.svg)
+
 Multi-channel ADC data acquisition on STM32: 4 channels sampled at 10 kHz via timer-triggered ADC with DMA double-buffering, framed and streamed over UART at 921600 baud.
 
 **Hardware:** STM32F103C8T6 · ADC1 · DMA1 · TIM2 · USART1
@@ -86,9 +88,13 @@ python3 tools/receiver.py --port /dev/ttyUSB0 --baud 921600 --channels 4 --csv l
 - [x] Non-blocking UART DMA TX with explicit drop counting
 - [x] Compile-time throughput check
 - [x] Host receiver (parse / CRC check / CSV / live plot)
+- [x] Repeatable analog and timing validation procedure
 - [ ] Verify analog front-end (source impedance vs. 13.5-cycle sampling time)
 - [ ] Measured sample-rate / jitter validation with a logic analyzer
 - [ ] STM32CubeMX `.ioc` for graphical pin configuration (init is currently hand-written)
+
+See [`docs/hardware-validation.md`](docs/hardware-validation.md) for the exact
+bench procedure and results table for the two measurement-dependent items.
 
 ## License
 
