@@ -51,7 +51,12 @@ void uart_packet_send_frame(const uint16_t *samples)
     seq++;
 
     tx_busy = 1;
-    HAL_UART_Transmit_DMA(s_huart, tx_buf, DC_BYTES_PER_FRAME);
+    if (HAL_UART_Transmit_DMA(s_huart, tx_buf, DC_BYTES_PER_FRAME) != HAL_OK) {
+        // Do not deadlock the stream if DMA startup fails (for example if the
+        // HAL peripheral state is unexpectedly busy).
+        tx_busy = 0;
+        dropped++;
+    }
 }
 
 uint32_t uart_packet_dropped(void)

@@ -32,6 +32,8 @@ def crc8(data: bytes) -> int:
 
 def frame_iter(ser, n_channels):
     """Yield (seq, samples) tuples, resynchronizing on CRC failure."""
+    if n_channels <= 0:
+        raise ValueError("n_channels must be greater than zero")
     frame_len = 2 + 2 + 2 * n_channels + 1
     buf = bytearray()
     while True:
@@ -48,9 +50,13 @@ def frame_iter(ser, n_channels):
                 del buf[:i]
                 break
             frame = bytes(buf[i:i + frame_len])
-            del buf[:i + frame_len]
             if crc8(frame[:-1]) != frame[-1]:
-                continue  # corrupt frame: drop and resync
+                # Advance by one byte only. A valid sync marker may occur
+                # inside the corrupt candidate, so consuming frame_len bytes
+                # here could discard the beginning of the next good frame.
+                del buf[:i + 1]
+                continue
+            del buf[:i + frame_len]
             seq = struct.unpack_from("<H", frame, 2)[0]
             samples = struct.unpack_from("<%dH" % n_channels, frame, 4)
             yield seq, samples
@@ -64,6 +70,11 @@ def main():
     ap.add_argument("--csv", help="log samples to this CSV file")
     ap.add_argument("--plot", action="store_true", help="live plot (needs matplotlib)")
     args = ap.parse_args()
+
+    if args.channels <= 0:
+        ap.error("--channels must be greater than zero")
+    if args.baud <= 0:
+        ap.error("--baud must be greater than zero")
 
     try:
         import serial
